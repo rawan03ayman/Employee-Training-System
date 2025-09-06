@@ -1,0 +1,491 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Employee Training & Development System</title>
+    <link rel="stylesheet" href="styles.css">
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css" rel="stylesheet">
+</head>
+<body>
+    <!-- Login Page -->
+    <div id="loginPage" class="page">
+        <div class="login-container">
+            <div class="login-form">
+                <h2><i class="fas fa-graduation-cap"></i> Training System</h2>
+                <form id="loginForm">
+                    <div class="form-group">
+                        <label for="username">Username</label>
+                        <input type="text" id="username" name="username" required>
+                    </div>
+                    <div class="form-group">
+                        <label for="password">Password</label>
+                        <input type="password" id="password" name="password" required>
+                    </div>
+                    <button type="submit" class="btn btn-primary">Login</button>
+                </form>
+                <!-- TEMPORARY: Test user creation button - Remove in production -->
+                <div style="margin-top: 20px; text-align: center;">
+                    <button type="button" onclick="createTestUser()" class="btn btn-secondary">
+                        Create Test User (Admin)
+                    </button>
+                    <p style="font-size: 12px; color: #666; margin-top: 10px;">
+                        Test credentials: admin / admin123
+                    </p>
+                </div>
+                <div id="loginError" class="error-message"></div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Admin Dashboard -->
+    <div id="adminDashboard" class="page hidden">
+        <nav class="navbar">
+            <div class="nav-brand">
+                <i class="fas fa-graduation-cap"></i>
+                <span>Training Admin</span>
+            </div>
+            <div class="nav-user">
+                <span id="adminUserName"></span>
+                <button id="logoutBtn" class="btn btn-secondary">Logout</button>
+            </div>
+        </nav>
+
+        <div class="dashboard-container">
+            <aside class="sidebar">
+                <ul class="nav-menu">
+                    <li><a href="#" class="nav-link active" data-section="overview"><i class="fas fa-chart-dashboard"></i> Overview</a></li>
+                    <li><a href="#" class="nav-link" data-section="courses"><i class="fas fa-book"></i> Courses</a></li>
+                    <li><a href="#" class="nav-link" data-section="users"><i class="fas fa-users"></i> Users</a></li>
+                    <li><a href="#" class="nav-link" data-section="enrollments"><i class="fas fa-clipboard-list"></i> Enrollments</a></li>
+                    <li><a href="#" class="nav-link" data-section="reports"><i class="fas fa-chart-bar"></i> Reports</a></li>
+                </ul>
+            </aside>
+
+            <main class="main-content">
+                <!-- Overview Section -->
+                <section id="overview" class="content-section active">
+                    <div class="section-header">
+                        <h1>Dashboard Overview</h1>
+                    </div>
+                    <div class="stats-grid">
+                        <div class="stat-card">
+                            <div class="stat-icon"><i class="fas fa-book"></i></div>
+                            <div class="stat-content">
+                                <h3 id="totalCourses">0</h3>
+                                <p>Total Courses</p>
+                            </div>
+                        </div>
+                        <div class="stat-card">
+                            <div class="stat-icon"><i class="fas fa-users"></i></div>
+                            <div class="stat-content">
+                                <h3 id="totalUsers">0</h3>
+                                <p>Total Users</p>
+                            </div>
+                        </div>
+                        <div class="stat-card">
+                            <div class="stat-icon"><i class="fas fa-clipboard-check"></i></div>
+                            <div class="stat-content">
+                                <h3 id="totalEnrollments">0</h3>
+                                <p>Active Enrollments</p>
+                            </div>
+                        </div>
+                        <div class="stat-card">
+                            <div class="stat-icon"><i class="fas fa-chart-line"></i></div>
+                            <div class="stat-content">
+                                <h3 id="completionRate">0%</h3>
+                                <p>Completion Rate</p>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="recent-activities">
+                        <h2>Recent Activities</h2>
+                        <div id="recentActivities" class="activities-list">
+                            <!-- Recent activities will be loaded here -->
+                        </div>
+                    </div>
+                </section>
+
+                <!-- Courses Section -->
+                <section id="courses" class="content-section">
+                    <div class="section-header">
+                        <h1>Course Management</h1>
+                        <button id="addCourseBtn" class="btn btn-primary"><i class="fas fa-plus"></i> Add Course</button>
+                    </div>
+                    <div class="courses-grid" id="coursesGrid">
+                        <!-- Courses will be loaded here -->
+                    </div>
+                </section>
+
+                <!-- Users Section -->
+                <section id="users" class="content-section">
+                    <div class="section-header">
+                        <h1>User Management</h1>
+                        <button id="addUserBtn" class="btn btn-primary"><i class="fas fa-user-plus"></i> Add User</button>
+                    </div>
+                    <div class="users-table-container">
+                        <table class="data-table" id="usersTable">
+                            <thead>
+                                <tr>
+                                    <th>Name</th>
+                                    <th>Email</th>
+                                    <th>Department</th>
+                                    <th>Role</th>
+                                    <th>Status</th>
+                                    <th>Actions</th>
+                                </tr>
+                            </thead>
+                            <tbody id="usersTableBody">
+                                <!-- Users will be loaded here -->
+                            </tbody>
+                        </table>
+                    </div>
+                </section>
+
+                <!-- Enrollments Section -->
+                <section id="enrollments" class="content-section">
+                    <div class="section-header">
+                        <h1>Enrollment Management</h1>
+                        <button id="assignCourseBtn" class="btn btn-primary"><i class="fas fa-user-graduate"></i> Assign Course</button>
+                    </div>
+                    <div class="enrollments-table-container">
+                        <table class="data-table" id="enrollmentsTable">
+                            <thead>
+                                <tr>
+                                    <th>Employee</th>
+                                    <th>Course</th>
+                                    <th>Progress</th>
+                                    <th>Status</th>
+                                    <th>Enrolled Date</th>
+                                    <th>Actions</th>
+                                </tr>
+                            </thead>
+                            <tbody id="enrollmentsTableBody">
+                                <!-- Enrollments will be loaded here -->
+                            </tbody>
+                        </table>
+                    </div>
+                </section>
+
+                <!-- Reports Section -->
+                <section id="reports" class="content-section">
+                    <div class="section-header">
+                        <h1>Reports & Analytics</h1>
+                        <button id="generateReportBtn" class="btn btn-primary"><i class="fas fa-file-export"></i> Generate Report</button>
+                    </div>
+                    <div class="reports-grid">
+                        <div class="report-card">
+                            <h3>Course Performance</h3>
+                            <canvas id="coursePerformanceChart"></canvas>
+                        </div>
+                        <div class="report-card">
+                            <h3>Employee Progress</h3>
+                            <canvas id="employeeProgressChart"></canvas>
+                        </div>
+                        <div class="report-card">
+                            <h3>Department Training Status</h3>
+                            <canvas id="departmentChart"></canvas>
+                        </div>
+                    </div>
+                </section>
+            </main>
+        </div>
+    </div>
+
+    <!-- Employee Dashboard -->
+    <div id="employeeDashboard" class="page hidden">
+        <nav class="navbar">
+            <div class="nav-brand">
+                <i class="fas fa-graduation-cap"></i>
+                <span>My Training</span>
+            </div>
+            <div class="nav-user">
+                <span id="employeeUserName"></span>
+                <button id="employeeLogoutBtn" class="btn btn-secondary">Logout</button>
+            </div>
+        </nav>
+
+        <div class="dashboard-container">
+            <aside class="sidebar">
+                <ul class="nav-menu">
+                    <li><a href="#" class="nav-link active" data-section="emp-overview"><i class="fas fa-chart-dashboard"></i> Overview</a></li>
+                    <li><a href="#" class="nav-link" data-section="my-courses"><i class="fas fa-book-open"></i> My Courses</a></li>
+                    <li><a href="#" class="nav-link" data-section="available-courses"><i class="fas fa-search"></i> Browse Courses</a></li>
+                    <li><a href="#" class="nav-link" data-section="progress"><i class="fas fa-chart-line"></i> Progress</a></li>
+                    <li><a href="#" class="nav-link" data-section="certificates"><i class="fas fa-certificate"></i> Certificates</a></li>
+                </ul>
+            </aside>
+
+            <main class="main-content">
+                <!-- Employee Overview -->
+                <section id="emp-overview" class="content-section active">
+                    <div class="section-header">
+                        <h1>My Learning Dashboard</h1>
+                    </div>
+                    <div class="stats-grid">
+                        <div class="stat-card">
+                            <div class="stat-icon"><i class="fas fa-book-open"></i></div>
+                            <div class="stat-content">
+                                <h3 id="empEnrolledCourses">0</h3>
+                                <p>Enrolled Courses</p>
+                            </div>
+                        </div>
+                        <div class="stat-card">
+                            <div class="stat-icon"><i class="fas fa-check-circle"></i></div>
+                            <div class="stat-content">
+                                <h3 id="empCompletedCourses">0</h3>
+                                <p>Completed Courses</p>
+                            </div>
+                        </div>
+                        <div class="stat-card">
+                            <div class="stat-icon"><i class="fas fa-clock"></i></div>
+                            <div class="stat-content">
+                                <h3 id="empInProgressCourses">0</h3>
+                                <p>In Progress</p>
+                            </div>
+                        </div>
+                        <div class="stat-card">
+                            <div class="stat-icon"><i class="fas fa-trophy"></i></div>
+                            <div class="stat-content">
+                                <h3 id="empCertificates">0</h3>
+                                <p>Certificates</p>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="current-courses">
+                        <h2>Current Courses</h2>
+                        <div id="currentCoursesList" class="courses-list">
+                            <!-- Current courses will be loaded here -->
+                        </div>
+                    </div>
+                </section>
+
+                <!-- My Courses Section -->
+                <section id="my-courses" class="content-section">
+                    <div class="section-header">
+                        <h1>My Courses</h1>
+                    </div>
+                    <div id="myCoursesGrid" class="courses-grid">
+                        <!-- User's courses will be loaded here -->
+                    </div>
+                </section>
+
+                <!-- Available Courses Section -->
+                <section id="available-courses" class="content-section">
+                    <div class="section-header">
+                        <h1>Available Courses</h1>
+                        <div class="search-filter">
+                            <input type="text" id="courseSearch" placeholder="Search courses...">
+                            <select id="categoryFilter">
+                                <option value="">All Categories</option>
+                                <option value="Technical">Technical</option>
+                                <option value="Soft Skills">Soft Skills</option>
+                                <option value="Leadership">Leadership</option>
+                                <option value="Safety">Safety</option>
+                            </select>
+                        </div>
+                    </div>
+                    <div id="availableCoursesGrid" class="courses-grid">
+                        <!-- Available courses will be loaded here -->
+                    </div>
+                </section>
+
+                <!-- Progress Section -->
+                <section id="progress" class="content-section">
+                    <div class="section-header">
+                        <h1>My Progress</h1>
+                    </div>
+                    <div class="progress-overview">
+                        <div class="progress-chart">
+                            <canvas id="personalProgressChart"></canvas>
+                        </div>
+                        <div class="progress-details" id="progressDetails">
+                            <!-- Progress details will be loaded here -->
+                        </div>
+                    </div>
+                </section>
+
+                <!-- Certificates Section -->
+                <section id="certificates" class="content-section">
+                    <div class="section-header">
+                        <h1>My Certificates</h1>
+                    </div>
+                    <div id="certificatesGrid" class="certificates-grid">
+                        <!-- Certificates will be loaded here -->
+                    </div>
+                </section>
+            </main>
+        </div>
+    </div>
+
+    <!-- Modals -->
+    <!-- Add Course Modal -->
+    <div id="addCourseModal" class="modal">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h2>Add New Course</h2>
+                <span class="close">&times;</span>
+            </div>
+            <form id="addCourseForm">
+                <div class="form-row">
+                    <div class="form-group">
+                        <label for="courseTitle">Course Title</label>
+                        <input type="text" id="courseTitle" name="title" required>
+                    </div>
+                    <div class="form-group">
+                        <label for="courseCategory">Category</label>
+                        <select id="courseCategory" name="category" required>
+                            <option value="">Select Category</option>
+                            <option value="Technical">Technical</option>
+                            <option value="Soft Skills">Soft Skills</option>
+                            <option value="Leadership">Leadership</option>
+                            <option value="Safety">Safety</option>
+                        </select>
+                    </div>
+                </div>
+                <div class="form-group">
+                    <label for="courseDescription">Description</label>
+                    <textarea id="courseDescription" name="description" rows="4" required></textarea>
+                </div>
+                <div class="form-row">
+                    <div class="form-group">
+                        <label for="courseDuration">Duration (hours)</label>
+                        <input type="number" id="courseDuration" name="duration" required>
+                    </div>
+                    <div class="form-group">
+                        <label for="courseLevel">Level</label>
+                        <select id="courseLevel" name="level" required>
+                            <option value="">Select Level</option>
+                            <option value="Beginner">Beginner</option>
+                            <option value="Intermediate">Intermediate</option>
+                            <option value="Advanced">Advanced</option>
+                        </select>
+                    </div>
+                </div>
+                <div class="form-row">
+                    <div class="form-group">
+                        <label for="courseInstructor">Instructor</label>
+                        <input type="text" id="courseInstructor" name="instructor" required>
+                    </div>
+                    <div class="form-group">
+                        <label for="maxParticipants">Max Participants</label>
+                        <input type="number" id="maxParticipants" name="maxParticipants" required>
+                    </div>
+                </div>
+                <div class="form-row">
+                    <div class="form-group">
+                        <label for="startDate">Start Date</label>
+                        <input type="date" id="startDate" name="startDate" required>
+                    </div>
+                    <div class="form-group">
+                        <label for="endDate">End Date</label>
+                        <input type="date" id="endDate" name="endDate" required>
+                    </div>
+                </div>
+                <div class="modal-actions">
+                    <button type="button" class="btn btn-secondary" onclick="closeModal('addCourseModal')">Cancel</button>
+                    <button type="submit" class="btn btn-primary">Create Course</button>
+                </div>
+            </form>
+        </div>
+    </div>
+
+    <!-- Add User Modal -->
+    <div id="addUserModal" class="modal">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h2>Add New User</h2>
+                <span class="close">&times;</span>
+            </div>
+            <form id="addUserForm">
+                <div class="form-row">
+                    <div class="form-group">
+                        <label for="userFirstName">First Name</label>
+                        <input type="text" id="userFirstName" name="firstName" required>
+                    </div>
+                    <div class="form-group">
+                        <label for="userLastName">Last Name</label>
+                        <input type="text" id="userLastName" name="lastName" required>
+                    </div>
+                </div>
+                <div class="form-row">
+                    <div class="form-group">
+                        <label for="userUsername">Username</label>
+                        <input type="text" id="userUsername" name="username" required>
+                    </div>
+                    <div class="form-group">
+                        <label for="userEmail">Email</label>
+                        <input type="email" id="userEmail" name="email" required>
+                    </div>
+                </div>
+                <div class="form-row">
+                    <div class="form-group">
+                        <label for="userPassword">Password</label>
+                        <input type="password" id="userPassword" name="password" required>
+                    </div>
+                    <div class="form-group">
+                        <label for="userRole">Role</label>
+                        <select id="userRole" name="role" required>
+                            <option value="">Select Role</option>
+                            <option value="1">Employee</option>
+                            <option value="0">Admin</option>
+                        </select>
+                    </div>
+                </div>
+                <div class="form-group">
+                    <label for="userDepartment">Department</label>
+                    <input type="text" id="userDepartment" name="department" required>
+                </div>
+                <div class="modal-actions">
+                    <button type="button" class="btn btn-secondary" onclick="closeModal('addUserModal')">Cancel</button>
+                    <button type="submit" class="btn btn-primary">Create User</button>
+                </div>
+            </form>
+        </div>
+    </div>
+
+    <!-- Course Assignment Modal -->
+    <div id="assignCourseModal" class="modal">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h2>Assign Course to Employee</h2>
+                <span class="close">&times;</span>
+            </div>
+            <form id="assignCourseForm">
+                <div class="form-group">
+                    <label for="assignEmployee">Select Employee</label>
+                    <select id="assignEmployee" name="employeeId" required>
+                        <option value="">Select Employee</option>
+                    </select>
+                </div>
+                <div class="form-group">
+                    <label for="assignCourse">Select Course</label>
+                    <select id="assignCourse" name="courseId" required>
+                        <option value="">Select Course</option>
+                    </select>
+                </div>
+                <div class="modal-actions">
+                    <button type="button" class="btn btn-secondary" onclick="closeModal('assignCourseModal')">Cancel</button>
+                    <button type="submit" class="btn btn-primary">Assign Course</button>
+                </div>
+            </form>
+        </div>
+    </div>
+
+    <!-- Course Details Modal -->
+    <div id="courseDetailsModal" class="modal">
+        <div class="modal-content course-details">
+            <div class="modal-header">
+                <h2 id="courseDetailsTitle">Course Details</h2>
+                <span class="close">&times;</span>
+            </div>
+            <div id="courseDetailsContent">
+                <!-- Course details will be loaded here -->
+            </div>
+        </div>
+    </div>
+
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/Chart.js/3.9.1/chart.min.js"></script>
+    <script src="script.js"></script>
+</body>
+</html>
